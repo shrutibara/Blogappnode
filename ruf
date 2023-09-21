@@ -1,0 +1,74 @@
+const express = require('express');
+// const mongoose = require('mongoose');
+const { connectToDb, getDb } = require('./service');
+const bodyparser= require('body-parser')
+const app = express();
+const PORT = 4000;
+const cors = require('cors');
+app.use(cors());
+app.use(bodyparser.json());
+let db;
+// const userSchema = new mongoose.Schema({
+//     email: String,
+//     password: String,
+//     lastLogin: Date,
+// });
+// const User = mongoose.model( email, 'project');
+
+
+connectToDb((err) => {
+    if (!err) {
+        app.listen(PORT, () => {
+            console.log(`Server is running on port  ${PORT}`);
+        });
+        db = getDb();
+    }
+});
+console.log('Test log');
+const handlelogintime =( email,userobject)=>{
+const newobject={...userobject}
+newobject.lastlogintime=new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+db.collection('app').updateOne({"email":email},{$set:{lastlogintime:newobject.lastlogintime}},{upsert:true});
+
+};
+
+app.post('/login', async (req, res) => {
+    try {
+        
+        const { email, password} =req.body;
+        console.log(email)
+        const user = await db.collection('app').findOne({ "email": email, "password":password});
+        console.log(user);
+        console.log(email,password);
+        if(user){
+            handlelogintime(email,user);
+            res.json(user);
+        }else{
+            res.status(401).join({error:'incorrect email or password'});
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Could not fetch users' });
+    }
+
+});
+
+// app.post('/login', async (req, res) => {
+//     const { email, password } = req.body;
+
+
+//     const user = await User.findOne({ email, password });
+
+//     if (!user) {
+//         return res.status(401).json({ message: 'Invalid credentials' });
+//     }
+
+
+//     console.log('User found:', user.email);
+//     console.log('Updating lastLogin...');
+
+//     user.lastLogin = new Date();
+//     console.log('Last login updated:', user.lastLogin);
+//     await user.save();
+
+//     res.status(200).json({ message: 'Login successful' });
+// });
