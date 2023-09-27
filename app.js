@@ -42,7 +42,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
     clientID: '209115374976-huetf1qve753h4rqrot348gcgih8ok2v.apps.googleusercontent.com/',
     clientSecret: "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2",
-    callbackURL: "https://backnode-becd.onrender.com/auth/google/callback"
+    callbackURL: "https://blognode-5i5f.onrender.com/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
     userProfile=profile;
