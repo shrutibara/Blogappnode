@@ -45,7 +45,7 @@ passport.use(new GoogleStrategy({
     callbackURL: "https://blognode-5i5f.onrender.com/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    userProfile=profile;
+    userProfile = profile.id;
     return done(null, userProfile);
 }
 ));
@@ -142,17 +142,11 @@ app.post('/api/posts/:postId/like', async (req, res) => {
 
   app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-  // app.get(
-  //   '/auth/google/callback',
-  //   passport.authenticate('google', {
-  //     successRedirect: '/MainPage', 
-  //     failureRedirect: '/error', 
-  //   })
-  // );
+  
   app.get('/auth/google/callback', 
   passport.authenticate('google', { failureRedirect: '/error' }),
   function(req, res) {
-    // Successful authentication, redirect success.
+    
     res.send(userProfile);
   });
 
